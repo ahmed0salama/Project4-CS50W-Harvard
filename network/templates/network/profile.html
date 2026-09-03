@@ -34,8 +34,20 @@
                         <small class="text-muted">{{ post.timestamp|date:"M d Y, h:i A" }}</small>
                     </div>
                     <p class="mt-2 mb-2">{{ post.content }}</p>
-                    <div class="text-muted">
-                        ❤️ {{ post.likes.count }}
+                    <div class="d-flex align-items-center mt-2">
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-sm {% if user in post.likes.all %}btn-danger{% else %}btn-outline-danger{% endif %} mr-2" 
+                                    id="like-btn-{{ post.id }}" 
+                                    onclick="toggleLike('{{ post.id }}')">
+                                {% if user in post.likes.all %}❤️ Unlike{% else %}🤍 Like{% endif %}
+                            </button>
+                        {% else %}
+                            <span class="mr-2">❤️</span>
+                        {% endif %}
+                        
+                        <span id="like-count-{{ post.id }}">
+                            <strong>{{ post.likes.count }}</strong> Likes
+                        </span>
                     </div>
                 </div>
             {% empty %}

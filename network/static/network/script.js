@@ -68,3 +68,36 @@ function savePost(postId) {
         alert("Failed to update post. Check console/URLs.");
     });
 }
+
+function toggleLike(postId) {
+    fetch(`/like/${postId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        const likeBtn = document.getElementById(`like-btn-${postId}`);
+        const likeCount = document.getElementById(`like-count-${postId}`);
+
+        if (result.liked) {
+            likeBtn.className = "btn btn-sm btn-danger mr-2";
+            likeBtn.innerHTML = "❤️ Unlike";
+        } else {
+            likeBtn.className = "btn btn-sm btn-outline-danger mr-2";
+            likeBtn.innerHTML = "🤍 Like";
+        }
+
+        likeCount.innerHTML = `<strong>${result.likes_count}</strong> Likes`;
+    })
+    .catch(error => {
+        console.error('Error toggling like:', error);
+    });
+}

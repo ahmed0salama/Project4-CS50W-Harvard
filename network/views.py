@@ -102,6 +102,29 @@ def following(request):
     })
 
 
+@login_required
+def toggle_like(request, post_id):
+    if request.method == "POST":
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": "Post not found."}, status=404)
+
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+            liked = False
+        else:
+            post.likes.add(request.user)
+            liked = True
+
+        return JsonResponse({
+            "liked": liked,
+            "likes_count": post.likes.count()
+        })
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+
 def login_view(request):
     if request.method == "POST":
 
