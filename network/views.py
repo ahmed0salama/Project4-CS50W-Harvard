@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import User, Post, Follow
 from django.shortcuts import get_object_or_404
-
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -16,29 +16,34 @@ def index(request):
             Post.objects.create(user=request.user, content=content)
             return redirect("index")
 
-    posts = Post.objects.all().order_by("-timestamp")
+    posts_list = Post.objects.all().order_by("-timestamp")
+    paginator = Paginator(posts_list, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     return render(request, "network/index.html", {
-        "posts": posts
+        "page_obj": page_obj
     })
 
 
 def profile(request, username):
     profile_user = get_object_or_404(User, username=username)
-    posts = profile_user.posts.all().order_by("-timestamp")
+    posts_list = profile_user.posts.all().order_by("-timestamp")
     
+    paginator = Paginator(posts_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     is_following = False
     if request.user.is_authenticated and request.user != profile_user:
         is_following = Follow.objects.filter(user=request.user, following_user=profile_user).exists()
 
-    followers_count = profile_user.followers.count()
-    following_count = profile_user.following.count()
-
     return render(request, "network/profile.html", {
         "profile_user": profile_user,
-        "posts": posts,
-        "followers_count": followers_count,
-        "following_count": following_count,
+        "page_obj": page_obj,
+        "followers_count": profile_user.followers.count(),
+        "following_count": profile_user.following.count(),
         "is_following": is_following,
     })
 
@@ -56,14 +61,18 @@ def toggle_follow(request, username):
 
     return redirect("profile", username=username)
 
+
 @login_required
 def following(request):
     followed_users = Follow.objects.filter(user=request.user).values_list('following_user', flat=True)
-    
-    posts = Post.objects.filter(user__in=followed_users).order_by("-timestamp")
+    posts_list = Post.objects.filter(user__in=followed_users).order_by("-timestamp")
+
+    paginator = Paginator(posts_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(request, "network/following.html", {
-        "posts": posts
+        "page_obj": page_obj
     })
 
 

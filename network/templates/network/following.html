@@ -5,7 +5,7 @@
         <h3>Following</h3>
 
         <div class="posts-list">
-            {% for post in posts %}
+            {% for post in page_obj %}
                 <div class="card mb-3 p-3 shadow-sm">
                     <div class="d-flex justify-content-between align-items-center">
                         <h6 class="font-weight-bold mb-1">
@@ -22,5 +22,6 @@
                 <p class="text-muted">No posts from users you follow.</p>
             {% endfor %}
         </div>
+        {% include "network/pagination.html" %}
     </div>
 {% endblock %}
