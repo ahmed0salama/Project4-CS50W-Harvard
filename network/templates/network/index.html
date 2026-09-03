@@ -52,14 +52,10 @@
                                 <strong>{{ post.likes.count }}</strong> Likes
                             </span>
                         </div>
-                    
+
                         {% if user.is_authenticated and user == post.user %}
                             <button class="btn btn-sm btn-outline-primary" id="edit-btn-{{ post.id }}" onclick="editPost('{{ post.id }}')">Edit</button>
                         {% endif %}
-                        
-                        <span id="like-count-{{ post.id }}">
-                            <strong>{{ post.likes.count }}</strong> Likes
-                        </span>
                     </div>
                 </div>
             {% empty %}
