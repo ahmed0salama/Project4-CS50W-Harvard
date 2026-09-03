@@ -1,12 +1,38 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import User, Post, Follow
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
+import json
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+def edit_post(request, post_id):
+    if request.method == "PUT":
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": "Post not found."}, status=404)
+
+        if post.user != request.user:
+            return JsonResponse({"error": "Permission denied."}, status=403)
+
+        data = json.loads(request.body)
+        new_content = data.get("content", "").strip()
+
+        if not new_content:
+            return JsonResponse({"error": "Content cannot be empty."}, status=400)
+
+        post.content = new_content
+        post.save()
+
+        return JsonResponse({"message": "Post updated successfully.", "content": post.content})
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)
 
 
 def index(request):

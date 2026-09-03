@@ -10,7 +10,6 @@
         <script src="{% static 'network/script.js' %}"></script>
     </head>
     <body>
-
         <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <a class="navbar-brand" href="{% url 'index' %}">Network</a>
           
@@ -47,5 +46,8 @@
             {% block body %}
             {% endblock %}
         </div>
+        
+        <script src="{% static 'script.js' %}"></script>
+    
     </body>
 </html>
