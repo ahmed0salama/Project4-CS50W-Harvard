@@ -1,5 +1,41 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    <div class="container mt-4">
+        
+        {% if user.is_authenticated %}
+            <div class="card mb-4 p-3 shadow-sm">
+                <h5>New Post</h5>
+                <form action="{% url 'index' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        <textarea class="form-control" name="content" rows="3" placeholder="What's on your mind?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </form>
+            </div>
+        {% endif %}
+
+        <h3>Posts</h3>
+
+        <div class="posts-list">
+            {% for post in posts %}
+                <div class="card mb-3 p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="font-weight-bold mb-1">
+                            <a href="#">{{ post.user.username }}</a>
+                        </h6>
+                        <small class="text-muted">{{ post.timestamp|date:"M d Y, h:i A" }}</small>
+                    </div>
+                    <p class="mt-2 mb-2">{{ post.content }}</p>
+                    <div class="text-muted">
+                        ❤️ {{ post.likes.count }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted">No posts available yet.</p>
+            {% endfor %}
+        </div>
+
+    </div>
 {% endblock %}

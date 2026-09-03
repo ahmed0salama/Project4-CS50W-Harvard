@@ -1,14 +1,25 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from .models import User, Post
 
-from .models import User
 
 
 def index(request):
-    return render(request, "network/index.html")
+    if request.method == "POST":
+        content = request.POST.get("content")
+        if content and request.user.is_authenticated:
+            Post.objects.create(user=request.user, content=content)
+            return redirect("index")
+
+    posts = Post.objects.all().order_by("-timestamp")
+    
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
 
 
 def login_view(request):
