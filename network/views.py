@@ -56,6 +56,16 @@ def toggle_follow(request, username):
 
     return redirect("profile", username=username)
 
+@login_required
+def following(request):
+    followed_users = Follow.objects.filter(user=request.user).values_list('following_user', flat=True)
+    
+    posts = Post.objects.filter(user__in=followed_users).order_by("-timestamp")
+
+    return render(request, "network/following.html", {
+        "posts": posts
+    })
+
 
 def login_view(request):
     if request.method == "POST":

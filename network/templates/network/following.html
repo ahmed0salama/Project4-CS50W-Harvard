@@ -1,0 +1,26 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h3>Following</h3>
+
+        <div class="posts-list">
+            {% for post in posts %}
+                <div class="card mb-3 p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="font-weight-bold mb-1">
+                            <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+                        </h6>
+                        <small class="text-muted">{{ post.timestamp|date:"M d Y, h:i A" }}</small>
+                    </div>
+                    <p class="mt-2 mb-2">{{ post.content }}</p>
+                    <div class="text-muted">
+                        ❤️ {{ post.likes.count }}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted">No posts from users you follow.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
