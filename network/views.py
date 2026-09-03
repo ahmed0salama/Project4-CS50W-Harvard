@@ -89,6 +89,29 @@ def toggle_follow(request, username):
 
 
 @login_required
+def toggle_like(request, post_id):
+    if request.method == "POST":
+        try:
+            post = Post.objects.get(pk=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": "Post not found."}, status=404)
+
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+            liked = False
+        else:
+            post.likes.add(request.user)
+            liked = True
+
+        return JsonResponse({
+            "liked": liked,
+            "likes_count": post.likes.count()
+        })
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+
+@login_required
 def following(request):
     followed_users = Follow.objects.filter(user=request.user).values_list('following_user', flat=True)
     posts_list = Post.objects.filter(user__in=followed_users).order_by("-timestamp")
